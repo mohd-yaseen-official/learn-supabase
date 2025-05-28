@@ -44,27 +44,29 @@ export default function Signup() {
 
         checkAuthAndProfile();
 
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            async (_event, session) => {
-                setSession(session);
+        useEffect(() => {
+            const { data: subscription } = supabase.auth.onAuthStateChange(
+                async (_event, session) => {
+                    setSession(session);
 
-                if (session) {
-                    const { data: profile, error } = await supabase
-                        .from("profiles")
-                        .select("*")
-                        .eq("id", session.user.id)
-                        .single();
+                    if (session) {
+                        const { data: profile, error } = await supabase
+                            .from("profiles")
+                            .select("*")
+                            .eq("id", session.user.id)
+                            .single();
 
-                    setHasProfile(!!profile && !error);
-                } else {
-                    setHasProfile(false);
+                        setHasProfile(!!profile && !error);
+                    } else {
+                        setHasProfile(false);
+                    }
                 }
-            }
-        );
+            );
 
-        return () => {
-            listener?.unsubscribe();
-        };
+            return () => {
+                subscription?.unsubscribe();
+            };
+        }, []);
     }, []);
 
     const togglePasswordVisibility = () => {
