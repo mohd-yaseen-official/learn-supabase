@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/router";
+import { useRouter } from 'next/navigation';
 
 export default function Signup() {
     const router = useRouter();
@@ -95,7 +95,7 @@ export default function Signup() {
 
                 alert("Profile completed successfully!");
                 setIsSubmitting(false);
-                router.push('/')
+                router.push('/');
             }
         } catch (err) {
             setErrorMsg("Unexpected error occurred.");
