@@ -12,17 +12,19 @@ export default function Profile() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
             if (!session) {
-                router.push('/login');
+                router.push("/login");
                 return;
             }
 
             const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
+                .from("profiles")
+                .select("*")
+                .eq("id", session.user.id)
                 .single();
 
             if (profile) {
@@ -30,10 +32,10 @@ export default function Profile() {
                     fullName: profile.full_name,
                     username: profile.username,
                     email: session.user.email,
-                    createdAt: profile.created_at
+                    createdAt: profile.created_at,
                 });
             } else {
-                router.push('/signup')
+                router.push("/signup");
             }
 
             setLoading(false);
@@ -41,13 +43,17 @@ export default function Profile() {
 
         fetchUserData();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (!session) {
-                router.push('/login');
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+            (event, session) => {
+                if (!session) {
+                    router.push("/login");
+                }
             }
-        });
+        );
 
-        return () => subscription?.unsubscribe();
+        return () => {
+            authListener?.unsubscribe();
+        };
     }, [router]);
 
     if (loading) {
@@ -59,11 +65,11 @@ export default function Profile() {
     }
 
     if (!userData) {
-        router.push('/login')
+        router.push("/login");
     }
 
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long' };
+        const options = { year: "numeric", month: "long" };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
