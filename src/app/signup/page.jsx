@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
     const router = useRouter();
@@ -23,15 +23,17 @@ export default function Signup() {
 
     useEffect(() => {
         const checkAuthAndProfile = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
             setSession(session);
 
             if (session) {
                 // Check if user already has a profile
                 const { data: profile, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
+                    .from("profiles")
+                    .select("*")
+                    .eq("id", session.user.id)
                     .single();
 
                 setHasProfile(!!profile && !error);
@@ -45,12 +47,12 @@ export default function Signup() {
         const { data: listener } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
                 setSession(session);
-                
+
                 if (session) {
                     const { data: profile, error } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', session.user.id)
+                        .from("profiles")
+                        .select("*")
+                        .eq("id", session.user.id)
                         .single();
 
                     setHasProfile(!!profile && !error);
@@ -91,8 +93,8 @@ export default function Signup() {
                         data: {
                             username: formData.username,
                             full_name: formData.fullName,
-                        }
-                    }
+                        },
+                    },
                 });
 
                 if (error) {
@@ -101,8 +103,10 @@ export default function Signup() {
                     return;
                 }
 
-                alert("Registration successful! Please check your email to verify your account.");
-                setFormData(prev => ({ ...prev, password: "" }));
+                alert(
+                    "Registration successful! Please check your email to verify your account."
+                );
+                setFormData((prev) => ({ ...prev, password: "" }));
                 setIsSubmitting(false);
             } else if (session && !hasProfile) {
                 const { error: profileError } = await supabase
@@ -111,7 +115,6 @@ export default function Signup() {
                         id: session.user.id,
                         username: formData.username,
                         full_name: formData.fullName,
-                        email: session.user.email
                     });
 
                 if (profileError) {
@@ -122,9 +125,9 @@ export default function Signup() {
 
                 alert("Profile completed successfully!");
                 setIsSubmitting(false);
-                router.push('/');
+                router.push("/");
             } else {
-                router.push('/');
+                router.push("/");
             }
         } catch (err) {
             setErrorMsg("Unexpected error occurred.");
@@ -141,7 +144,7 @@ export default function Signup() {
     }
 
     if (session && hasProfile) {
-        router.push('/');
+        router.push("/");
         return null;
     }
 
@@ -252,7 +255,9 @@ export default function Signup() {
                         ) : (
                             <>
                                 <div className="mb-4">
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Logged in as: {session.user.email}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        Logged in as: {session.user.email}
+                                    </p>
                                 </div>
 
                                 <div>
@@ -324,7 +329,7 @@ export default function Signup() {
                                         Already have an account?{" "}
                                         <button
                                             onClick={() =>
-                                                router.push('/login')
+                                                router.push("/login")
                                             }
                                             className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium hover:underline focus:outline-none focus:underline transition-colors duration-200"
                                         >
