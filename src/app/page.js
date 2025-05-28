@@ -43,16 +43,40 @@ export default function Profile() {
 
         fetchUserData();
 
-        const authListener = supabase.auth.onAuthStateChange(
-            (event, session) => {
-                if (!session) {
-                    router.push("/login");
+        let authSubscription;
+        try {
+            const authResponse = supabase.auth.onAuthStateChange(
+                (event, session) => {
+                    if (!session) {
+                        router.push("/login");
+                    }
                 }
+            );
+            
+            // Handle different return patterns
+            if (authResponse && authResponse.data && authResponse.data.subscription) {
+                authSubscription = authResponse.data.subscription;
+            } else if (authResponse && typeof authResponse.unsubscribe === 'function') {
+                authSubscription = authResponse;
+            } else if (authResponse && authResponse.subscription) {
+                authSubscription = authResponse.subscription;
             }
-        );
+        } catch (error) {
+            console.error('Auth listener setup failed:', error);
+        }
 
         return () => {
-            authListener?.unsubscribe();
+            try {
+                if (authSubscription) {
+                    if (typeof authSubscription.unsubscribe === 'function') {
+                        authSubscription.unsubscribe();
+                    } else if (typeof authSubscription === 'function') {
+                        authSubscription();
+                    }
+                }
+            } catch (error) {
+                console.error('Auth listener cleanup failed:', error);
+            }
         };
     }, [router]);
 
