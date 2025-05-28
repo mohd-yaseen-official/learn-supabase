@@ -18,15 +18,45 @@ export default function Signup() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
     const [session, setSession] = useState(null);
+    const [hasProfile, setHasProfile] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        const checkAuthAndProfile = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             setSession(session);
-        });
+
+            if (session) {
+                // Check if user already has a profile
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+
+                setHasProfile(!!profile && !error);
+            }
+
+            setLoading(false);
+        };
+
+        checkAuthAndProfile();
 
         const { data: listener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            async (_event, session) => {
                 setSession(session);
+                
+                if (session) {
+                    const { data: profile, error } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    setHasProfile(!!profile && !error);
+                } else {
+                    setHasProfile(false);
+                }
             }
         );
 
@@ -57,6 +87,12 @@ export default function Signup() {
                 const { data, error } = await supabase.auth.signUp({
                     email: formData.email,
                     password: formData.password,
+                    options: {
+                        data: {
+                            username: formData.username,
+                            full_name: formData.fullName,
+                        }
+                    }
                 });
 
                 if (error) {
@@ -65,27 +101,18 @@ export default function Signup() {
                     return;
                 }
 
-                alert(
-                    "Registration successful! Please check your email to verify your account."
-                );
-
-                setFormData((prev) => ({
-                    ...prev,
-                    password: "",
-                }));
-
+                alert("Registration successful! Please check your email to verify your account.");
+                setFormData(prev => ({ ...prev, password: "" }));
                 setIsSubmitting(false);
-            } else {
+            } else if (session && !hasProfile) {
                 const { error: profileError } = await supabase
                     .from("profiles")
-                    .upsert(
-                        {
-                            id: session.user.id,
-                            username: formData.username,
-                            full_name: formData.fullName,
-                        },
-                        { onConflict: "id" }
-                    );
+                    .upsert({
+                        id: session.user.id,
+                        username: formData.username,
+                        full_name: formData.fullName,
+                        email: session.user.email
+                    });
 
                 if (profileError) {
                     setErrorMsg(profileError.message);
@@ -96,12 +123,27 @@ export default function Signup() {
                 alert("Profile completed successfully!");
                 setIsSubmitting(false);
                 router.push('/');
+            } else {
+                router.push('/');
             }
         } catch (err) {
             setErrorMsg("Unexpected error occurred.");
             setIsSubmitting(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (session && hasProfile) {
+        router.push('/');
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -209,6 +251,10 @@ export default function Signup() {
                             </>
                         ) : (
                             <>
+                                <div className="mb-4">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Logged in as: {session.user.email}</p>
+                                </div>
+
                                 <div>
                                     <label
                                         htmlFor="username"
@@ -267,7 +313,12 @@ export default function Signup() {
                         <div className="mt-6 text-center">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {session ? (
-                                    "You're logged in."
+                                    <button
+                                        onClick={() => supabase.auth.signOut()}
+                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium hover:underline focus:outline-none focus:underline transition-colors duration-200"
+                                    >
+                                        Not you? Sign out
+                                    </button>
                                 ) : (
                                     <>
                                         Already have an account?{" "}
