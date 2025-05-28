@@ -32,6 +32,8 @@ export default function Profile() {
                     email: session.user.email,
                     createdAt: profile.created_at
                 });
+            } else {
+                router.push('/signup')
             }
 
             setLoading(false);
@@ -91,7 +93,7 @@ export default function Profile() {
                                     </span>
                                 </div>
                                 <div className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-base">
-                                    {userData.fullName || "Not provided"}
+                                    {userData?.fullName ?? "Not provided"}
                                 </div>
                             </div>
 
@@ -103,7 +105,7 @@ export default function Profile() {
                                     </span>
                                 </div>
                                 <div className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-base">
-                                    @{userData.username || "Not provided"}
+                                    @{userData?.username ?? "Not provided"}
                                 </div>
                             </div>
 
@@ -115,14 +117,14 @@ export default function Profile() {
                                     </span>
                                 </div>
                                 <div className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-base">
-                                    {userData.email}
+                                    {userData?.email}
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                             <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-2">
-                                Member since {formatDate(userData.createdAt)}
+                                Member since {formatDate(userData?.createdAt)}
                             </p>
                         </div>
                     </div>
