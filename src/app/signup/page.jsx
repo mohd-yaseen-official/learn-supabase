@@ -29,7 +29,6 @@ export default function Signup() {
             setSession(session);
 
             if (session) {
-                // Check if user already has a profile
                 const { data: profile, error } = await supabase
                     .from("profiles")
                     .select("*")
@@ -43,30 +42,30 @@ export default function Signup() {
         };
 
         checkAuthAndProfile();
+    }, []);
 
-        useEffect(() => {
-            const { data: subscription } = supabase.auth.onAuthStateChange(
-                async (_event, session) => {
-                    setSession(session);
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            async (_event, session) => {
+                setSession(session);
 
-                    if (session) {
-                        const { data: profile, error } = await supabase
-                            .from("profiles")
-                            .select("*")
-                            .eq("id", session.user.id)
-                            .single();
+                if (session) {
+                    const { data: profile, error } = await supabase
+                        .from("profiles")
+                        .select("*")
+                        .eq("id", session.user.id)
+                        .single();
 
-                        setHasProfile(!!profile && !error);
-                    } else {
-                        setHasProfile(false);
-                    }
+                    setHasProfile(!!profile && !error);
+                } else {
+                    setHasProfile(false);
                 }
-            );
+            }
+        );
 
-            return () => {
-                subscription?.unsubscribe();
-            };
-        }, []);
+        return () => {
+            subscription?.unsubscribe();
+        };
     }, []);
 
     const togglePasswordVisibility = () => {
