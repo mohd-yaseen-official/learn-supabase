@@ -2,7 +2,7 @@
 
 A hands-on project demonstrating user authentication and profile management using Supabase, Next.js, and Tailwind CSS.
 
-![Project Screenshot](/app-preview.png)
+![Project Screenshot](/screenshot.png)
 
 ## Features ✨
 
@@ -109,7 +109,7 @@ learn-supabase/
 - **/signup** - User registration
 
 ## Deployment 🚀
-- [Vercel](https://)
+- [Vercel](https://learn-supabase-sable.vercel.app/)
   
 ## Contributing 🤝
 
