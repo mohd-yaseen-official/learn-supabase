@@ -43,7 +43,7 @@ export default function Profile() {
 
         fetchUserData();
 
-        const { data: authListener } = supabase.auth.onAuthStateChange(
+        const authListener = supabase.auth.onAuthStateChange(
             (event, session) => {
                 if (!session) {
                     router.push("/login");
