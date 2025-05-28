@@ -90,6 +90,8 @@ export default function Signup() {
                     email: formData.email,
                     password: formData.password,
                     options: {
+                        emailRedirectTo:
+                            "https://learn-supabase-sable.vercel.app/signup",
                         data: {
                             username: formData.username,
                             full_name: formData.fullName,
