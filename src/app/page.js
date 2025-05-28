@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Mail, AtSign } from "lucide-react";
+import { User, Mail, AtSign, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -52,30 +52,37 @@ export default function Profile() {
                     }
                 }
             );
-            
+
             // Handle different return patterns
-            if (authResponse && authResponse.data && authResponse.data.subscription) {
+            if (
+                authResponse &&
+                authResponse.data &&
+                authResponse.data.subscription
+            ) {
                 authSubscription = authResponse.data.subscription;
-            } else if (authResponse && typeof authResponse.unsubscribe === 'function') {
+            } else if (
+                authResponse &&
+                typeof authResponse.unsubscribe === "function"
+            ) {
                 authSubscription = authResponse;
             } else if (authResponse && authResponse.subscription) {
                 authSubscription = authResponse.subscription;
             }
         } catch (error) {
-            console.error('Auth listener setup failed:', error);
+            console.error("Auth listener setup failed:", error);
         }
 
         return () => {
             try {
                 if (authSubscription) {
-                    if (typeof authSubscription.unsubscribe === 'function') {
+                    if (typeof authSubscription.unsubscribe === "function") {
                         authSubscription.unsubscribe();
-                    } else if (typeof authSubscription === 'function') {
+                    } else if (typeof authSubscription === "function") {
                         authSubscription();
                     }
                 }
             } catch (error) {
-                console.error('Auth listener cleanup failed:', error);
+                console.error("Auth listener cleanup failed:", error);
             }
         };
     }, [router]);
@@ -95,6 +102,16 @@ export default function Profile() {
     const formatDate = (dateString) => {
         const options = { year: "numeric", month: "long" };
         return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+
+    const handleSignOut = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            router.push("/login");
+        } catch (error) {
+            console.error("Error signing out:", error.message);
+        }
     };
 
     return (
@@ -157,6 +174,14 @@ export default function Profile() {
                                 Member since {formatDate(userData?.createdAt)}
                             </p>
                         </div>
+
+                        <button
+                            onClick={handleSignOut}
+                            className="w-full flex items-center justify-center gap-2 py-2 px-4 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Sign Out
+                        </button>
                     </div>
                 </div>
             </div>
