@@ -70,7 +70,7 @@ export default function Login() {
                             Welcome back
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400">
-                            Sign in to your account
+                            Log in to your account
                         </p>
                     </div>
 
@@ -140,16 +140,6 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-end">
-                            <button
-                                type="button"
-                                onClick={() => router.push("/forgot-password")}
-                                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium hover:underline focus:outline-none transition-colors duration-200"
-                            >
-                                Forgot password?
-                            </button>
-                        </div>
-
                         <button
                             type="submit"
                             disabled={isSubmitting}
@@ -158,10 +148,10 @@ export default function Login() {
                             {isSubmitting ? (
                                 <div className="flex items-center justify-center">
                                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                                    Signing in...
+                                    Logging in...
                                 </div>
                             ) : (
-                                "Sign in"
+                                "Log in"
                             )}
                         </button>
 
